@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPSC Current Affairs Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --ink2: #444;
+    --ink3: #888;
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --border: #e0ddd6;
+    --accent: #1a3a2a;
+    --accent-light: #e8f0eb;
+    --pre: #c0392b;
+    --pre-bg: #fdf0ef;
+    --mains: #1a5c2e;
+    --mains-bg: #edf7f0;
+    --both: #7d4c00;
+    --both-bg: #fef6e4;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── SETUP SCREEN ── */
+  #setup-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .setup-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  .setup-logo {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .setup-logo::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  .setup-box h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .setup-box p {
+    font-size: 13px;
+    color: var(--ink3);
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+
+  .setup-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .step-text {
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.7;
+  }
+
+  .step-text a {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .step-text code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink2);
+    margin-bottom: 6px;
+    letter-spacing: .02em;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .2s;
+  }
+
+  .input-group input:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+
+  .input-group .hint {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-top: 5px;
+  }
+
+  .btn-connect {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Sora', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity .2s;
+  }
+
+  .btn-connect:hover { opacity: .88; }
+
+  #setup-error {
+    font-size: 12px;
+    color: var(--pre);
+    margin-top: 10px;
+    min-height: 16px;
+  }
+
+  /* ── MAIN APP ── */
+  #app { display: none; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .brand {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .db-name {
+    font-size: 12px;
+    color: var(--ink3);
+  }
+
+  .btn-logout {
+    font-size: 12px;
+    color: var(--ink3);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: 'Sora', sans-serif;
+  }
+
+  .btn-logout:hover { background: var(--bg); color: var(--ink); }
+
+  nav {
+    display: flex;
+    gap: 4px;
+    padding: 0 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color .15s, border-color .15s;
+  }
+
+  .nav-tab:hover { color: var(--ink); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 20px;
+  }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── FORM ── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 14px;
+  }
+
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink2);
+    margin-bottom: 5px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    resize: vertical;
+    transition: border-color .2s, background .2s;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+
+  .field textarea { min-height: 72px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .pill-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+
+  .pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    color: var(--ink2);
+    background: var(--surface);
+    transition: all .15s;
+    user-select: none;
+  }
+
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
+  .pill.sel { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .btn-primary {
+    padding: 10px 22px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Sora', sans-serif;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+
+  .btn-primary:hover { opacity: .85; }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+  .btn-secondary {
+    padding: 10px 18px;
+    background: transparent;
+    color: var(--ink2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: 'Sora', sans-serif;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover { background: var(--bg); }
+
+  #form-msg {
+    font-size: 12px;
+    min-height: 16px;
+    margin-top: 8px;
+  }
+
+  /* ── LOG ── */
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .filter-bar span {
+    font-size: 12px;
+    color: var(--ink3);
+  }
+
+  .entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    transition: border-color .2s;
+  }
+
+  .entry:hover { border-color: #c0bdb4; }
+
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .entry-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .btn-del {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #f0c0bc;
+    background: var(--pre-bg);
+    color: var(--pre);
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Sora', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .btn-del:hover { background: #fde0de; }
+
+  .entry-meta {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .tag-pre { background: var(--pre-bg); color: var(--pre); }
+  .tag-mains { background: var(--mains-bg); color: var(--mains); }
+  .tag-both { background: var(--both-bg); color: var(--both); }
+  .tag-gs { background: var(--bg); color: var(--ink2); border: 1px solid var(--border); }
+
+  .entry-facts {
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+
+  .chip {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .chip-static { background: #e8f0eb; color: var(--accent); }
+  .chip-q { background: var(--both-bg); color: var(--both); }
+
+  .notion-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--ink3);
+    margin-top: 8px;
+  }
+
+  .notion-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+  }
+
+  .notion-dot.pending { background: #f59e0b; }
+  .notion-dot.error { background: var(--pre); }
+
+  /* ── REVISION ── */
+  .rev-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .rev-card:hover {
+    border-color: #c0bdb4;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+
+  .rev-front { }
+  .rev-back { display: none; padding-top: 14px; border-top: 1px solid var(--border); margin-top: 12px; }
+  .rev-card.flipped .rev-back { display: block; }
+
+  .rev-hint {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── STATS ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-num { font-size: 28px; font-weight: 600; color: var(--ink); }
+  .stat-lbl { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+
+  .hm-row {
+    display: grid;
+    grid-template-columns: 52px 1fr 24px;
+    gap: 8px;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--bg);
+  }
+
+  .hm-day { font-size: 12px; color: var(--ink2); font-weight: 500; }
+  .hm-dots { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  .hm-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    cursor: default;
+  }
+
+  .hm-count { font-size: 11px; color: var(--ink3); text-align: right; }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .bar-lbl { font-size: 12px; color: var(--ink2); min-width: 40px; }
+  .bar-track { flex: 1; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .4s; }
+  .bar-count { font-size: 12px; color: var(--ink3); min-width: 20px; text-align: right; }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--ink3);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 13px;
+    color: var(--ink3);
+  }
+
+  .sync-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--ink3);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+  }
+
+  @media (max-width: 500px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-box">
+    <div class="setup-logo">UPSC Tracker · Setup</div>
+    <h1>Connect to Notion</h1>
+    <p>Your current affairs entries will be saved directly to a Notion database. Complete these steps once — takes about 5 minutes.</p>
+
+    <div class="setup-step">
+      <div class="step-num">1</div>
+      <div class="step-text">Go to <a href="https://www.notion.so/profile/integrations" target="_blank">notion.so/profile/integrations</a>, click <strong>New integration</strong>, name it <code>UPSC Tracker</code>, click <strong>Save</strong>, then copy the <strong>Internal Integration Secret</strong> token.</div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">2</div>
+      <div class="step-text">In Notion, create a new <strong>full-page database</strong> (not inline). Name it <code>UPSC Current Affairs</code>. Open it, click <strong>···</strong> (top right) → <strong>Connections</strong> → add your <code>UPSC Tracker</code> integration.</div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">3</div>
+      <div class="step-text">Copy the database ID from the URL. It looks like: <code>notion.so/<strong>abc123...def456</strong>?v=...</code> — the part between the last <code>/</code> and the <code>?</code>.</div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">4</div>
+      <div class="step-text">Paste both below and click Connect.</div>
+    </div>
+
+    <div class="input-group">
+      <label>Notion Integration Token</label>
+      <input type="password" id="s-token" placeholder="secret_xxxxxxxxxxxxxxxxx">
+      <div class="hint">Starts with "secret_" — keep this private</div>
+    </div>
+
+    <div class="input-group">
+      <label>Database ID</label>
+      <input type="text" id="s-dbid" placeholder="abc1234567890def1234567890abcdef">
+      <div class="hint">32-character ID from your Notion database URL</div>
+    </div>
+
+    <button class="btn-connect" onclick="connect()" id="connect-btn">Connect to Notion</button>
+    <div id="setup-error"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header>
+    <div class="brand">UPSC Tracker</div>
+    <div class="header-right">
+      <div class="sync-status" id="sync-status">
+        <span class="notion-dot" id="sync-dot"></span>
+        <span id="sync-text">Connected to Notion</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Change settings</button>
+    </div>
+  </header>
+
+  <nav>
+    <div class="nav-tab active" onclick="gotoTab('add', this)">+ Add entry</div>
+    <div class="nav-tab" onclick="gotoTab('log', this)">This week</div>
+    <div class="nav-tab" onclick="gotoTab('rev', this)">Revision cards</div>
+    <div class="nav-tab" onclick="gotoTab('stats', this)">Stats</div>
+  </nav>
+
+  <main>
+
+    <!-- ADD ENTRY -->
+    <div id="view-add" class="view active">
+      <div class="section-title">Story details</div>
+      <div class="form-card">
+        <div class="field">
+          <label>Headline / topic</label>
+          <input type="text" id="f-title" placeholder="e.g. Delimitation Bill 2026 introduced in Parliament">
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="f-date">
+          </div>
+          <div class="field">
+            <label>Page / section</label>
+            <select id="f-page">
+              <option>Front page</option>
+              <option>The World</option>
+              <option>Politics</option>
+              <option>Economy</option>
+              <option>Science & Tech</option>
+              <option>Society</option>
+              <option>Editorial</option>
+              <option>Explained</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>UPSC relevance</label>
+          <div class="pill-group" id="rel-pills">
+            <div class="pill sel" data-v="Prelims" onclick="singlePill(this,'rel-pills')">Prelims</div>
+            <div class="pill" data-v="Mains" onclick="singlePill(this,'rel-pills')">Mains</div>
+            <div class="pill" data-v="Both" onclick="singlePill(this,'rel-pills')">Both</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>GS paper(s)</label>
+          <div class="pill-group" id="gs-pills">
+            <div class="pill" data-v="GS1" onclick="multiPill(this)">GS1</div>
+            <div class="pill" data-v="GS2" onclick="multiPill(this)">GS2</div>
+            <div class="pill" data-v="GS3" onclick="multiPill(this)">GS3</div>
+            <div class="pill" data-v="GS4" onclick="multiPill(this)">GS4</div>
+            <div class="pill" data-v="CSAT" onclick="multiPill(this)">CSAT</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">Your notes</div>
+      <div class="form-card">
+        <div class="field">
+          <label>Key facts (2–3 bullets)</label>
+          <textarea id="f-facts" placeholder="e.g. Lok Sabha seats: 543 → 850. Delimitation based on 2011 Census. Women's 1/3 reservation valid 15 years."></textarea>
+        </div>
+        <div class="field">
+          <label>Static syllabus link</label>
+          <input type="text" id="f-static" placeholder="e.g. Art. 81, 82 — Laxmikanth Ch.4; 106th Amendment 2023">
+        </div>
+        <div class="field">
+          <label>Probable UPSC question</label>
+          <textarea id="f-q" placeholder="e.g. Prelims: Which article deals with readjustment of LS seats? OR Mains: Examine federal implications of delimitation."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" id="save-btn" onclick="saveEntry()">Save to Notion</button>
+        <button class="btn-secondary" onclick="clearForm()">Clear</button>
+      </div>
+      <div id="form-msg"></div>
+    </div>
+
+    <!-- LOG -->
+    <div id="view-log" class="view">
+      <div class="filter-bar">
+        <span>Filter:</span>
+        <div class="pill sel" data-f="All" onclick="setFilter(this,'All')">All</div>
+        <div class="pill" data-f="Prelims" onclick="setFilter(this,'Prelims')">Prelims</div>
+        <div class="pill" data-f="Mains" onclick="setFilter(this,'Mains')">Mains</div>
+        <div class="pill" data-f="GS1" onclick="setFilter(this,'GS1')">GS1</div>
+        <div class="pill" data-f="GS2" onclick="setFilter(this,'GS2')">GS2</div>
+        <div class="pill" data-f="GS3" onclick="setFilter(this,'GS3')">GS3</div>
+        <div class="pill" data-f="GS4" onclick="setFilter(this,'GS4')">GS4</div>
+      </div>
+      <div id="log-list"></div>
+    </div>
+
+    <!-- REVISION -->
+    <div id="view-rev" class="view">
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:16px">Tap a card to reveal your static link and probable question. Use these for your 10-minute morning revision.</p>
+      <div id="rev-list"></div>
+    </div>
+
+    <!-- STATS -->
+    <div id="view-stats" class="view">
+      <div class="stat-grid" id="stat-boxes"></div>
+      <div class="chart-card">
+        <div class="section-title">Weekly reading heatmap</div>
+        <div id="heatmap"></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--pre)"></div>Prelims</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--mains)"></div>Mains</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#b45309"></div>Both</div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="section-title">Coverage by GS paper</div>
+        <div id="gs-bars"></div>
+      </div>
+      <div class="cta-row">
+        <button class="btn-secondary" onclick="window.sendPrompt && sendPrompt('Give me a 10-question Prelims quiz based on my UPSC current affairs tracker entries')">Mock Prelims quiz ↗</button>
+        <button class="btn-secondary" onclick="window.sendPrompt && sendPrompt('Write 3 sample 15-mark Mains answers from my recent UPSC tracker entries')">Sample Mains answers ↗</button>
+        <button class="btn-secondary" onclick="window.sendPrompt && sendPrompt('Identify gaps in my UPSC preparation based on my tracker — which GS areas am I missing?')">Find my gaps ↗</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const GS_PAPERS = ['GS1','GS2','GS3','GS4','CSAT'];
+let entries = [];
+let activeFilter = 'All';
+let token = '';
+let dbId = '';
+const PROXY = 'https://upsc-notion-proxy.vercel.app'; // explained in guide
+
+function init() {
+  token = localStorage.getItem('notion_token') || '';
+  dbId  = localStorage.getItem('notion_db')    || '';
+  entries = JSON.parse(localStorage.getItem('upsc_entries') || '[]');
+  if (token && dbId) {
+    showApp();
+  } else {
+    document.getElementById('setup-screen').style.display = 'flex';
+  }
+  const dt = document.getElementById('f-date');
+  if (dt) dt.value = today();
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+async function connect() {
+  const t = document.getElementById('s-token').value.trim();
+  const d = document.getElementById('s-dbid').value.trim().replace(/-/g,'');
+  const errEl = document.getElementById('setup-error');
+  const btn = document.getElementById('connect-btn');
+
+  if (!t || !d) { errEl.textContent = 'Please fill in both fields.'; return; }
+  if (!t.startsWith('secret_')) { errEl.textContent = 'Token should start with "secret_"'; return; }
+  if (d.length < 32) { errEl.textContent = 'Database ID should be 32 characters. Check the URL again.'; return; }
+
+  btn.textContent = 'Connecting…';
+  btn.disabled = true;
+  errEl.textContent = '';
+
+  try {
+    const res = await notionRequest(`/databases/${d}`, 'GET', null, t);
+    if (res.object === 'error') {
+      errEl.textContent = 'Could not connect: ' + (res.message || 'Unknown error. Check your token and database ID.');
+      btn.textContent = 'Connect to Notion'; btn.disabled = false; return;
+    }
+    localStorage.setItem('notion_token', t);
+    localStorage.setItem('notion_db', d);
+    await ensureSchema(d, t);
+    token = t; dbId = d;
+    showApp();
+  } catch(e) {
+    errEl.textContent = 'Connection failed: ' + e.message;
+    btn.textContent = 'Connect to Notion'; btn.disabled = false;
+  }
+}
+
+async function ensureSchema(db, tok) {
+  const needed = {
+    Date:        { date: {} },
+    Page:        { select: { options: [] } },
+    Relevance:   { select: { options: [{ name:'Prelims',color:'red' },{ name:'Mains',color:'green' },{ name:'Both',color:'yellow' }] } },
+    'GS Papers': { multi_select: { options: GS_PAPERS.map(g => ({ name: g })) } },
+    'Key Facts': { rich_text: {} },
+    'Static Link':{ rich_text: {} },
+    Question:    { rich_text: {} }
+  };
+  await notionRequest(`/databases/${db}`, 'PATCH', { properties: needed }, tok);
+}
+
+async function notionRequest(path, method, body, tok) {
+  const t = tok || token;
+  const res = await fetch(`https://api.notion.com/v1${path}`, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${t}`,
+      'Notion-Version': '2022-06-28',
+      'Content-Type': 'application/json'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return res.json();
+}
+
+function showApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  setSyncStatus('ok');
+  renderLog(); renderStats();
+}
+
+function logout() {
+  if (!confirm('This will clear your connection settings. Your Notion data stays safe. Continue?')) return;
+  localStorage.removeItem('notion_token');
+  localStorage.removeItem('notion_db');
+  token = ''; dbId = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'flex';
+  document.getElementById('connect-btn').textContent = 'Connect to Notion';
+  document.getElementById('connect-btn').disabled = false;
+  document.getElementById('setup-error').textContent = '';
+}
+
+function setSyncStatus(state, text) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-text');
+  dot.className = 'notion-dot' + (state === 'pending' ? ' pending' : state === 'error' ? ' error' : '');
+  txt.textContent = text || (state === 'ok' ? 'Connected to Notion' : state === 'pending' ? 'Saving…' : 'Sync error');
+}
+
+function singlePill(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' .pill').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function multiPill(el) { el.classList.toggle('sel'); }
+
+function getRelVal() {
+  const s = document.querySelector('#rel-pills .pill.sel');
+  return s ? s.dataset.v : 'Both';
+}
+
+function getGsVals() {
+  return [...document.querySelectorAll('#gs-pills .pill.sel')].map(p => p.dataset.v);
+}
+
+function clearForm() {
+  ['f-title','f-facts','f-q'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-static').value = '';
+  document.getElementById('f-date').value = today();
+  document.querySelectorAll('#rel-pills .pill').forEach((p,i) => { p.classList.remove('sel'); if(i===0) p.classList.add('sel'); });
+  document.querySelectorAll('#gs-pills .pill').forEach(p => p.classList.remove('sel'));
+  document.getElementById('form-msg').textContent = '';
+}
+
+async function saveEntry() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { showMsg('Please add a headline.', 'error'); return; }
+
+  const entry = {
+    id: Date.now(),
+    title,
+    date: document.getElementById('f-date').value || today(),
+    page: document.getElementById('f-page').value,
+    rel: getRelVal(),
+    gs: getGsVals(),
+    facts: document.getElementById('f-facts').value.trim(),
+    stat: document.getElementById('f-static').value.trim(),
+    q: document.getElementById('f-q').value.trim(),
+    notionId: null,
+    syncStatus: 'pending'
+  };
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  setSyncStatus('pending');
+
+  try {
+    const payload = buildNotionPayload(entry);
+    const result = await notionRequest('/pages', 'POST', payload);
+    if (result.object === 'error') throw new Error(result.message);
+    entry.notionId = result.id;
+    entry.syncStatus = 'synced';
+    setSyncStatus('ok');
+  } catch(e) {
+    entry.syncStatus = 'error';
+    setSyncStatus('error', 'Sync failed — saved locally');
+  }
+
+  entries.unshift(entry);
+  localStorage.setItem('upsc_entries', JSON.stringify(entries));
+  clearForm();
+  showMsg(entry.syncStatus === 'synced' ? 'Saved to Notion!' : 'Saved locally (Notion sync failed — check token)', entry.syncStatus === 'synced' ? 'ok' : 'error');
+  btn.disabled = false;
+  btn.textContent = 'Save to Notion';
+}
+
+function buildNotionPayload(e) {
+  const richText = t => t ? [{ type: 'text', text: { content: t } }] : [];
+  return {
+    parent: { database_id: dbId },
+    properties: {
+      Name:          { title: [{ text: { content: e.title } }] },
+      Date:          { date: { start: e.date } },
+      Page:          { select: { name: e.page } },
+      Relevance:     { select: { name: e.rel } },
+      'GS Papers':   { multi_select: e.gs.map(g => ({ name: g })) },
+      'Key Facts':   { rich_text: richText(e.facts) },
+      'Static Link': { rich_text: richText(e.stat) },
+      Question:      { rich_text: richText(e.q) }
+    }
+  };
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('form-msg');
+  el.style.color = type === 'ok' ? 'var(--mains)' : 'var(--pre)';
+  el.textContent = text;
+  setTimeout(() => el.textContent = '', 4000);
+}
+
+function gotoTab(id, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  el.classList.add('active');
+  if (id === 'log') renderLog();
+  if (id === 'rev') renderRev();
+  if (id === 'stats') renderStats();
+}
+
+function tagHtml(rel) {
+  if (rel === 'Prelims') return '<span class="tag tag-pre">Prelims</span>';
+  if (rel === 'Mains')   return '<span class="tag tag-mains">Mains</span>';
+  return '<span class="tag tag-both">Both</span>';
+}
+
+function matchFilter(e) {
+  if (activeFilter === 'All') return true;
+  if (['Prelims','Mains','Both'].includes(activeFilter)) return e.rel === activeFilter || (activeFilter !== 'Both' && e.rel === 'Both');
+  return (e.gs || []).includes(activeFilter);
+}
+
+function setFilter(el, val) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-bar .pill').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel');
+  renderLog();
+}
+
+function renderLog() {
+  const el = document.getElementById('log-list');
+  const filtered = entries.filter(matchFilter);
+  if (!filtered.length) { el.innerHTML = '<div class="empty">No entries yet. Add your first story from the + Add entry tab.</div>'; return; }
+  el.innerHTML = filtered.map(e => `
+    <div class="entry">
+      <div class="entry-head">
+        <div class="entry-title">${e.title}</div>
+        <button class="btn-del" onclick="deleteEntry(${e.id})">Delete</button>
+      </div>
+      <div class="entry-meta">${e.date} &middot; ${e.page}</div>
+      <div class="tags">
+        ${tagHtml(e.rel)}
+        ${(e.gs||[]).map(g => `<span class="tag tag-gs">${g}</span>`).join('')}
+      </div>
+      ${e.facts ? `<div class="entry-facts">${e.facts.replace(/\n/g,'<br>')}</div>` : ''}
+      ${e.stat  ? `<div><span class="chip chip-static">Static: ${e.stat}</span></div>` : ''}
+      ${e.q     ? `<div><span class="chip chip-q">Q: ${e.q}</span></div>` : ''}
+      <div class="notion-badge">
+        <span class="notion-dot ${e.syncStatus === 'synced' ? '' : e.syncStatus === 'error' ? 'error' : 'pending'}"></span>
+        ${e.syncStatus === 'synced' ? 'Saved in Notion' : e.syncStatus === 'error' ? 'Notion sync failed' : 'Pending sync'}
+        ${e.notionId ? ` &middot; <a href="https://notion.so/${e.notionId.replace(/-/g,'')}" target="_blank" style="color:var(--ink3)">Open in Notion</a>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function deleteEntry(id) {
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  if (e.notionId) {
+    try {
+      await notionRequest(`/pages/${e.notionId}`, 'PATCH', { archived: true });
+    } catch(err) {}
+  }
+  entries = entries.filter(x => x.id !== id);
+  localStorage.setItem('upsc_entries', JSON.stringify(entries));
+  renderLog(); renderStats();
+}
+
+function renderRev() {
+  const el = document.getElementById('rev-list');
+  if (!entries.length) { el.innerHTML = '<div class="empty">No entries yet. Add stories first.</div>'; return; }
+  el.innerHTML = entries.map(e => `
+    <div class="rev-card" id="rc${e.id}" onclick="flipCard(${e.id})">
+      <div class="rev-front">
+        <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px">${e.title}</div>
+        <div style="font-size:11px;color:var(--ink3);font-family:'JetBrains Mono',monospace;margin-bottom:8px">${e.date} &middot; ${e.page}</div>
+        ${tagHtml(e.rel)}
+        <div class="rev-hint">Tap to reveal static link + question</div>
+      </div>
+      <div class="rev-back">
+        ${e.facts ? `<div style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:10px">${e.facts.replace(/\n/g,'<br>')}</div>` : ''}
+        ${e.stat  ? `<div style="margin-bottom:6px"><span class="chip chip-static">Static: ${e.stat}</span></div>` : ''}
+        ${e.q     ? `<div><span class="chip chip-q">Q: ${e.q}</span></div>` : ''}
+        <div class="rev-hint" style="margin-top:10px">Tap to flip back</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function flipCard(id) {
+  document.getElementById('rc' + id).classList.toggle('flipped');
+}
+
+function renderStats() {
+  const total = entries.length;
+  const pre   = entries.filter(e => e.rel === 'Prelims' || e.rel === 'Both').length;
+  const mains = entries.filter(e => e.rel === 'Mains'   || e.rel === 'Both').length;
+  const synced = entries.filter(e => e.syncStatus === 'synced').length;
+
+  document.getElementById('stat-boxes').innerHTML = `
+    <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-lbl">Total entries</div></div>
+    <div class="stat-box"><div class="stat-num">${pre}</div><div class="stat-lbl">Prelims-relevant</div></div>
+    <div class="stat-box"><div class="stat-num">${mains}</div><div class="stat-lbl">Mains-relevant</div></div>
+  `;
+
+  const byDay = {};
+  DAYS.forEach(d => byDay[d] = []);
+  entries.forEach(e => {
+    const d = new Date(e.date);
+    const day = DAYS[d.getDay() === 0 ? 6 : d.getDay() - 1];
+    if (byDay[day]) byDay[day].push(e);
+  });
+
+  document.getElementById('heatmap').innerHTML = DAYS.map(d => {
+    const items = byDay[d];
+    const dots = items.map(e => {
+      const col = e.rel === 'Prelims' ? 'var(--pre)' : e.rel === 'Mains' ? 'var(--mains)' : '#b45309';
+      return `<div class="hm-dot" style="background:${col}" title="${e.title}"></div>`;
+    }).join('') || '<span style="font-size:11px;color:var(--ink3)">—</span>';
+    return `<div class="hm-row"><div class="hm-day">${d}</div><div class="hm-dots">${dots}</div><div class="hm-count">${items.length || ''}</div></div>`;
+  }).join('');
+
+  const gc = {};
+  GS_PAPERS.forEach(g => gc[g] = 0);
+  entries.forEach(e => (e.gs||[]).forEach(g => { if(gc[g] !== undefined) gc[g]++; }));
+  const maxG = Math.max(...Object.values(gc), 1);
+
+  document.getElementById('gs-bars').innerHTML = GS_PAPERS.map(g => `
+    <div class="bar-row">
+      <div class="bar-lbl">${g}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(gc[g]/maxG*100)}%"></div></div>
+      <div class="bar-count">${gc[g]}</div>
+    </div>
+  `).join('');
+}
+
+init();
+</script>
+</body>
+</html>
