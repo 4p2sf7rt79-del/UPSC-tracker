@@ -658,7 +658,7 @@
   <div class="setup-box">
     <div class="setup-logo">UPSC Tracker · Setup</div>
     <h1>Connect to Notion</h1>
-    <p>Your current affairs entries will be saved directly to a Notion database. Complete these steps once — takes about 5 minutes.</p>
+    <p>A small proxy is needed to securely connect to Notion. You'll set this up once in about 5 minutes — everything is free.</p>
 
     <div class="setup-step">
       <div class="step-num">1</div>
@@ -667,17 +667,23 @@
 
     <div class="setup-step">
       <div class="step-num">2</div>
-      <div class="step-text">In Notion, create a new <strong>full-page database</strong> (not inline). Name it <code>UPSC Current Affairs</code>. Open it, click <strong>···</strong> (top right) → <strong>Connections</strong> → add your <code>UPSC Tracker</code> integration.</div>
+      <div class="step-text">Go to <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a> → sign up free → click <strong>Create Worker</strong> → delete all the default code → paste the contents of <code>worker.js</code> (the second file you downloaded) → click <strong>Deploy</strong>. Copy the Worker URL shown (ends in <code>.workers.dev</code>).</div>
     </div>
 
     <div class="setup-step">
       <div class="step-num">3</div>
-      <div class="step-text">Copy the database ID from the URL. It looks like: <code>notion.so/<strong>abc123...def456</strong>?v=...</code> — the part between the last <code>/</code> and the <code>?</code>.</div>
+      <div class="step-text">In Notion, create a new <strong>full-page database</strong>. Name it <code>UPSC Current Affairs</code>. Click <strong>···</strong> → <strong>Connections</strong> → add your <code>UPSC Tracker</code> integration.</div>
     </div>
 
     <div class="setup-step">
       <div class="step-num">4</div>
-      <div class="step-text">Paste both below and click Connect.</div>
+      <div class="step-text">Copy the database ID from the URL — the 32-character part between the last <code>/</code> and the <code>?</code>. Then fill in all three fields below.</div>
+    </div>
+
+    <div class="input-group">
+      <label>Cloudflare Worker URL</label>
+      <input type="text" id="s-proxy" placeholder="https://upsc-tracker-proxy.yourname.workers.dev">
+      <div class="hint">Your proxy worker URL — see Step 2 of the new guide</div>
     </div>
 
     <div class="input-group">
@@ -843,7 +849,9 @@ let entries = [];
 let activeFilter = 'All';
 let token = '';
 let dbId = '';
-const PROXY = 'https://upsc-notion-proxy.vercel.app'; // explained in guide
+// Set this to YOUR Cloudflare Worker URL after deploying worker.js
+// e.g. 'https://upsc-tracker-proxy.YOUR-SUBDOMAIN.workers.dev'
+const PROXY = localStorage.getItem('proxy_url') || '';
 
 function init() {
   token = localStorage.getItem('notion_token') || '';
@@ -863,12 +871,14 @@ function today() {
 }
 
 async function connect() {
+  const proxy = document.getElementById('s-proxy').value.trim().replace(/\/$/, '');
   const t = document.getElementById('s-token').value.trim();
   const d = document.getElementById('s-dbid').value.trim().replace(/-/g,'');
   const errEl = document.getElementById('setup-error');
   const btn = document.getElementById('connect-btn');
 
-  if (!t || !d) { errEl.textContent = 'Please fill in both fields.'; return; }
+  if (!proxy) { errEl.textContent = 'Please enter your Cloudflare Worker URL.'; return; }
+  if (!t || !d) { errEl.textContent = 'Please fill in all three fields.'; return; }
   if (!t.startsWith('secret_')) { errEl.textContent = 'Token should start with "secret_"'; return; }
   if (d.length < 32) { errEl.textContent = 'Database ID should be 32 characters. Check the URL again.'; return; }
 
@@ -876,10 +886,16 @@ async function connect() {
   btn.disabled = true;
   errEl.textContent = '';
 
+  localStorage.setItem('proxy_url', proxy);
+
   try {
-    const res = await notionRequest(`/databases/${d}`, 'GET', null, t);
-    if (res.object === 'error') {
-      errEl.textContent = 'Could not connect: ' + (res.message || 'Unknown error. Check your token and database ID.');
+    const res = await fetch(`${proxy}/notion/databases/${d}`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.object === 'error') {
+      errEl.textContent = 'Notion error: ' + (data.message || 'Check your token and database ID.');
       btn.textContent = 'Connect to Notion'; btn.disabled = false; return;
     }
     localStorage.setItem('notion_token', t);
@@ -888,7 +904,7 @@ async function connect() {
     token = t; dbId = d;
     showApp();
   } catch(e) {
-    errEl.textContent = 'Connection failed: ' + e.message;
+    errEl.textContent = 'Connection failed: ' + e.message + '. Make sure your Worker URL is correct and the Worker is deployed.';
     btn.textContent = 'Connect to Notion'; btn.disabled = false;
   }
 }
@@ -908,11 +924,12 @@ async function ensureSchema(db, tok) {
 
 async function notionRequest(path, method, body, tok) {
   const t = tok || token;
-  const res = await fetch(`https://api.notion.com/v1${path}`, {
+  const proxyBase = localStorage.getItem('proxy_url') || PROXY;
+  if (!proxyBase) throw new Error('Proxy URL not set. Please complete setup.');
+  const res = await fetch(`${proxyBase}/notion${path}`, {
     method,
     headers: {
       'Authorization': `Bearer ${t}`,
-      'Notion-Version': '2022-06-28',
       'Content-Type': 'application/json'
     },
     body: body ? JSON.stringify(body) : undefined
